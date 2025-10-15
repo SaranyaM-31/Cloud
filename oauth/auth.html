@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth0 Google Login Example</title>
+
+  <!-- ✅ Correct Auth0 SDK -->
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-color: #f0f0f0;
+    }
+    #profile {
+      display: none;
+      margin-top: 20px;
+    }
+    img {
+      border-radius: 50%;
+      width: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Login with Google (Auth0 Example)</h1>
+  <button id="login">Sign in with Google</button>
+  <button id="logout" style="display:none;">Logout</button>
+
+  <div id="profile">
+    <h2>Welcome, <span id="username"></span></h2>
+    <img id="userpic" alt="Profile Picture" />
+  </div>
+
+  <script>
+    let auth0Client;
+
+    async function initAuth0() {
+      // ✅ Correct function name: createAuth0Client (zero)
+      auth0Client = await createAuth0Client({
+        domain: "38gi0ybexnuhmgou.us.auth0.com",   // 🔹 replace with your Auth0 domain
+        client_id: "0kgr8TOxlRQqTTtG177fbzABfuGbg3JS",              // 🔹 replace with your Auth0 client ID
+        authorizationParams: {
+          redirect_uri: window.location.origin
+        }
+      });
+
+      // Handle redirect callback after login
+      if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
+        await auth0Client.handleRedirectCallback();
+        window.history.replaceState({}, document.title, "/");
+      }
+
+      // Check login status
+      const isAuthenticated = await auth0Client.isAuthenticated();
+
+      if (isAuthenticated) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("logout").style.display = "inline-block";
+
+        const user = await auth0Client.getUser();
+        document.getElementById("username").textContent = user.name;
+        document.getElementById("userpic").src = user.picture;
+        document.getElementById("profile").style.display = "block";
+      } else {
+        document.getElementById("login").style.display = "inline-block";
+      }
+    }
+
+    // Login
+    document.getElementById("login").addEventListener("click", async () => {
+      await auth0Client.loginWithRedirect({
+        authorizationParams: {
+          redirect_uri: window.location.origin,
+          connection: "google-oauth2" // forces Google login
+        }
+      });
+    });
+
+    // Logout
+    document.getElementById("logout").addEventListener("click", () => {
+      auth0Client.logout({
+        logoutParams: { returnTo: window.location.origin }
+      });
+    });
+
+    initAuth0();
+  </script>
+</body>
+</html>

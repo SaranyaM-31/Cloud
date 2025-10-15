@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random User API Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { padding: 10px 15px; margin-bottom: 20px; cursor: pointer; }
+    #userCard { border: 1px solid #ccc; padding: 10px; width: 300px; }
+    #userCard img { border-radius: 50%; }
+  </style>
+</head>
+<body>
+
+  <h1>Random User Generator</h1>
+  <button onclick="fetchUser()">Get Random User</button>
+
+  <div id="userCard" style="display: none;">
+    <img id="userImg" src="" alt="User">
+    <h2 id="userName"></h2>
+    <p id="userEmail"></p>
+    <p id="userLocation"></p>
+  </div>
+
+  <script>
+    function fetchUser() {
+      fetch('https://randomuser.me/api')
+        .then(response => response.json())
+        .then(data => {
+          const user = data.results[0];
+          document.getElementById('userImg').src = user.picture.large;
+          document.getElementById('userName').textContent = user.name.first + " " + user.name.last;
+          document.getElementById('userEmail').textContent = "Email: " + user.email;
+          document.getElementById('userLocation').textContent = "Location: " + user.location.city + ", " + user.location.country;
+          document.getElementById('userCard').style.display = "block";
+        })
+        .catch(error => console.error('Error fetching user:', error));
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auth0 Google Login Demo</title>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.27/auth0-spa-js.production.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 40px; }
+    button { padding: 10px 18px; font-size: 16px; border-radius: 6px; cursor: pointer; }
+    img { border-radius: 50%; width: 100px; height: 100px; margin-top: 8px; }
+    .info { text-align: left; display: inline-block; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+<h1>Auth0 Google Login Demo</h1>
+<div id="content">
+  <button id="login">Sign in with Google</button>
+</div>
+
+<script>
+  // Replace with your Auth0 info
+  const auth0Domain = "dev-38gi0ybexnuhmgou.us.auth0.com"; // e.g., xyz.us.auth0.com
+  const auth0ClientId = "0kgr8TOxlRQqTTtG177fbzABfuGbg3JS";
+
+  let auth0 = null;
+
+  async function initAuth0() {
+    auth0 = await createAuth0Client({
+      domain: auth0Domain,
+      client_id: auth0ClientId,
+      cacheLocation: 'localstorage',
+      redirect_uri: window.location.origin
+    });
+
+    // Handle redirect back from Auth0
+    if (window.location.search.includes("code=") && window.location.search.includes("state=")) {
+      await auth0.handleRedirectCallback();
+      window.history.replaceState({}, document.title, "/");
+    }
+
+    const isAuthenticated = await auth0.isAuthenticated();
+    if (isAuthenticated) {
+      showHome();
+    } else {
+      document.getElementById("login").style.display = "inline-block";
+    }
+  }
+
+  async function login() {
+    await auth0.loginWithRedirect({ connection: "google-oauth2" });
+  }
+
+  async function logout() {
+    await auth0.logout({ returnTo: window.location.origin });
+  }
+
+  async function showHome() {
+    const user = await auth0.getUser();
+    document.getElementById("content").innerHTML = `
+      <h2>Welcome, ${user.name}!</h2>
+      ${user.picture ? `<img src="${user.picture}" alt="avatar">` : ''}
+      <div class="info">
+        <div><strong>Email:</strong> ${user.email}</div>
+        <div><strong>Nickname:</strong> ${user.nickname}</div>
+      </div>
+      <div style="margin-top:24px">
+        <button onclick="logout()">Log out</button>
+      </div>
+    `;
+  }
+
+  document.getElementById("login").addEventListener("click", login);
+
+  initAuth0();
+</script>
+
+</body>
+</html>

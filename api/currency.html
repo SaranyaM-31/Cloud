@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastForex API Demo</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        button { padding: 10px 20px; margin-bottom: 20px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; max-height: 500px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>FastForex API Demo</h1>
+    <button id="fetchBtn">Fetch Latest Forex Rates</button>
+    <pre id="output">Response will appear here...</pre>
+
+    <script>
+        const apiKey = "d565f4cd77-4ec9ab957c-t46s2p";
+        const apiUrl = `https://api.fastforex.io/fetch-all?api_key=${apiKey}`;
+
+        document.getElementById("fetchBtn").addEventListener("click", async () => {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("output").textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

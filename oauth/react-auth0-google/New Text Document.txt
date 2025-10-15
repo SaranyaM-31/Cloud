@@ -1,0 +1,2 @@
+REACT_APP_AUTH0_DOMAIN=dev-38gi0ybexnuhmgou.us.auth0.com
+REACT_APP_AUTH0_CLIENT_ID=0kgr8TOxlRQqTTtG177fbzABfuGbg3JS

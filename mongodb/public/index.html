@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Simple Notes App</title>
+</head>
+<body>
+  <h1>Notes App</h1>
+
+  <input type="text" id="title" placeholder="Title">
+  <input type="text" id="content" placeholder="Content">
+  <button onclick="addNote()">Add Note</button>
+
+  <h2>All Notes</h2>
+  <ul id="notesList"></ul>
+
+<script>
+const api = "http://localhost:5000/notes";
+
+// Fetch notes
+async function fetchNotes() {
+  const res = await fetch(api);
+  const notes = await res.json();
+  const list = document.getElementById("notesList");
+  list.innerHTML = "";
+  notes.forEach(note => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <b>${note.title}</b>: ${note.content} 
+      <button onclick='updateNote("${note._id}")'>Update</button>
+      <button onclick='deleteNote("${note._id}")'>Delete</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+// Add note
+async function addNote() {
+  const title = document.getElementById("title").value;
+  const content = document.getElementById("content").value;
+  await fetch(api, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({title, content})
+  });
+  fetchNotes();
+}
+
+// Delete note
+async function deleteNote(id) {
+  await fetch(`${api}/${id}`, { method: "DELETE" });
+  fetchNotes();
+}
+
+// Update note
+async function updateNote(id) {
+  const title = prompt("New title:");
+  const content = prompt("New content:");
+  await fetch(`${api}/${id}`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({title, content})
+  });
+  fetchNotes();
+}
+
+// Load notes initially
+fetchNotes();
+</script>
+</body>
+</html>
